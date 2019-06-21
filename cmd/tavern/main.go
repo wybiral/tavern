@@ -80,6 +80,10 @@ func tavernInit(ctx *cli.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	_, err = os.Stat("public")
+	if os.IsNotExist(err) {
+		os.Mkdir("public", 0666)
+	}
 	fmt.Println("Done")
 }
 
