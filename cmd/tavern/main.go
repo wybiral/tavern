@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/urfave/cli"
+	"github.com/wybiral/tavern/app"
 )
 
 // current tavern CLI version
@@ -59,19 +60,29 @@ func main() {
 	}
 }
 
-func tavernHelp(c *cli.Context) {
-	args := c.Args()
+func tavernHelp(ctx *cli.Context) {
+	args := ctx.Args()
 	if args.Present() {
-		cli.ShowCommandHelp(c, args.First())
+		cli.ShowCommandHelp(ctx, args.First())
 		return
 	}
-	cli.ShowAppHelp(c)
+	cli.ShowAppHelp(ctx)
 }
 
-func tavernInit(c *cli.Context) {
+func tavernInit(ctx *cli.Context) {
 	log.Fatal("not implemented")
 }
 
-func tavernRun(c *cli.Context) {
-	log.Fatal("not implemented")
+func tavernRun(ctx *cli.Context) {
+	c := app.DefaultConfig()
+	err := c.ReadFile("tavern.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	a, err := app.NewApp(c)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Local server: http://%s:%d\n", c.Server.Host, c.Server.Port)
+	a.Run()
 }
