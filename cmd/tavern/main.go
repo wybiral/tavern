@@ -71,9 +71,12 @@ func tavernHelp(ctx *cli.Context) {
 
 func tavernInit(ctx *cli.Context) {
 	_, err := os.Stat("tavern.json")
-	if err == nil {
+	if os.IsNotExist(err) {
 		fmt.Println("Unable to init (tavern.json file already exists)")
 		os.Exit(1)
+	}
+	if err != nil {
+		log.Fatal(err)
 	}
 	c := app.DefaultConfig()
 	err = c.WriteFile("tavern.json")
