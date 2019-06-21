@@ -76,6 +76,10 @@ func tavernInit(ctx *cli.Context) {
 func tavernRun(ctx *cli.Context) {
 	c := app.DefaultConfig()
 	err := c.ReadFile("tavern.json")
+	if os.IsNotExist(err) {
+		fmt.Println("Missing tavern.json file")
+		os.Exit(1)
+	}
 	if err != nil {
 		log.Fatal(err)
 	}
