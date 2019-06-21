@@ -36,3 +36,15 @@ func (c *Config) ReadFile(path string) error {
 	d := json.NewDecoder(f)
 	return d.Decode(c)
 }
+
+// WriteFile writes Config to a JSON config file.
+func (c *Config) WriteFile(path string) error {
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	e := json.NewEncoder(f)
+	e.SetIndent("", "  ")
+	return e.Encode(c)
+}
