@@ -11,6 +11,7 @@ import (
 type App struct {
 	Config   *Config
 	Router   *mux.Router
+	Tor      *tor
 	Listener net.Listener
 }
 
@@ -28,11 +29,18 @@ func NewApp(c *Config) (*App, error) {
 	if err != nil {
 		return nil, err
 	}
-	// return App
+	// setup App
 	a := &App{
 		Config:   c,
 		Router:   r,
 		Listener: ln,
+	}
+	// setup tor
+	if c.Tor != nil {
+		a.Tor, err = newTor(c.Tor, c.Server)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return a, nil
 }

@@ -102,5 +102,8 @@ func tavernRun(ctx *cli.Context) {
 		log.Fatal(err)
 	}
 	fmt.Printf("Local server: http://%s:%d\n", c.Server.Host, c.Server.Port)
+	if a.Tor != nil {
+		fmt.Printf("Hidden service: http://%s.onion\n", a.Tor.Onion.ServiceID)
+	}
 	a.Run()
 }

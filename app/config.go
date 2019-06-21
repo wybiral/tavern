@@ -8,6 +8,7 @@ import (
 // Config stores App configuration.
 type Config struct {
 	Server *ServerConfig `json:"server"`
+	Tor    *TorConfig    `json:"tor,omitempty"`
 }
 
 // ServerConfig stores App server configuration.
@@ -16,12 +17,31 @@ type ServerConfig struct {
 	Port int    `json:"port"`
 }
 
+// TorConfig stores tor configuration.
+type TorConfig struct {
+	Controller     *TorControllerConfig `json:"controller"`
+	PrivateKeyFile string               `json:"private_key_file,omitempty"`
+}
+
+// TorControllerConfig stores tor controller configuration.
+type TorControllerConfig struct {
+	Host     string `json:"host"`
+	Port     int    `json:"port"`
+	Password string `json:"password,omitempty"`
+}
+
 // DefaultConfig returns a new Config filled with default values.
 func DefaultConfig() *Config {
 	return &Config{
 		Server: &ServerConfig{
 			Host: "127.0.0.1",
 			Port: 0,
+		},
+		Tor: &TorConfig{
+			Controller: &TorControllerConfig{
+				Host: "127.0.0.1",
+				Port: 9051,
+			},
 		},
 	}
 }
