@@ -13,9 +13,40 @@
   revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
   version = "v1.20.0"
 
+[[projects]]
+  branch = "master"
+  name = "github.com/wybiral/torgo"
+  packages = ["."]
+  revision = "a19a6c8a50489e2fdf37223edc5f1284bb965308"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/crypto"
+  packages = [
+    "ed25519",
+    "ed25519/internal/edwards25519",
+    "sha3"
+  ]
+  revision = "cc06ce4a13d484c0101a9e92913248488a75786d"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/net"
+  packages = [
+    "internal/socks",
+    "proxy"
+  ]
+  revision = "3b0461eec859c4b73bb64fdc8285971fd33e3938"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/sys"
+  packages = ["cpu"]
+  revision = "d432491b91382bba9c2a91776aa47c9430183a6f"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "960ba94672c2ded4dd920dbeadbdcd7406a818e776c9deb25ca309f2f2397c67"
+  inputs-digest = "35557b6c924d444ef3952b7671362a10ca6b68ce4275f9953153cb91569f7ef6"
   solver-name = "gps-cdcl"
   solver-version = 1
