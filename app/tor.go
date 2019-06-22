@@ -33,26 +33,24 @@ func newTor(ct *TorConfig, cs *ServerConfig) (*tor, error) {
 	t := &tor{
 		Controller: ctrl,
 	}
-	err = t.startOnion(ct.PrivateKeyFile, cs)
+	err = t.startOnion(cs)
 	if err != nil {
 		return nil, err
 	}
 	return t, nil
 }
 
-func (t *tor) startOnion(pkFile string, cs *ServerConfig) error {
+func (t *tor) startOnion(cs *ServerConfig) error {
 	addr := fmt.Sprintf("%s:%d", cs.Host, cs.Port)
 	t.Onion = &torgo.Onion{}
 	t.Onion.Ports = map[int]string{80: addr}
-	if len(pkFile) > 0 {
-		raw, err := ioutil.ReadFile(pkFile)
-		if err != nil {
-			return err
-		}
-		pk := strings.TrimSpace(string(raw))
-		parts := strings.SplitN(pk, ":", 2)
-		t.Onion.PrivateKeyType = parts[0]
-		t.Onion.PrivateKey = parts[1]
+	raw, err := ioutil.ReadFile("onion.key")
+	if err != nil {
+		return err
 	}
+	pk := strings.TrimSpace(string(raw))
+	parts := strings.SplitN(pk, ":", 2)
+	t.Onion.PrivateKeyType = parts[0]
+	t.Onion.PrivateKey = parts[1]
 	return t.Controller.AddOnion(t.Onion)
 }

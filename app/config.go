@@ -19,8 +19,7 @@ type ServerConfig struct {
 
 // TorConfig stores tor configuration.
 type TorConfig struct {
-	Controller     *TorControllerConfig `json:"controller"`
-	PrivateKeyFile string               `json:"private_key_file,omitempty"`
+	Controller *TorControllerConfig `json:"controller"`
 }
 
 // TorControllerConfig stores tor controller configuration.
