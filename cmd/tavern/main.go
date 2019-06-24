@@ -146,6 +146,7 @@ func generateOnionFile(keyType string) {
 			return
 		}
 	}
+	keyType = strings.ToLower(keyType)
 	if keyType == "ed25519" {
 		onion, err = generateEd25519()
 		if err != nil {
