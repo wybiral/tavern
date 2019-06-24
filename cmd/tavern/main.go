@@ -1,17 +1,14 @@
 package main
 
 import (
-	"crypto/rand"
-	"crypto/rsa"
 	"fmt"
 	"log"
 	"os"
 	"strings"
 
 	"github.com/urfave/cli"
-	"github.com/wybiral/tavern/app"
-	"github.com/wybiral/torgo"
-	"golang.org/x/crypto/ed25519"
+	"github.com/wybiral/tavern/pkg/app"
+	"github.com/wybiral/tavern/pkg/onionkey"
 )
 
 // current tavern CLI version
@@ -55,15 +52,8 @@ func main() {
 			Usage: "Tor onion tools",
 			Subcommands: []cli.Command{
 				cli.Command{
-					Name:  "new",
-					Usage: "Generate new Tor onion.key file",
-					Flags: []cli.Flag{
-						cli.StringFlag{
-							Name:  "type, t",
-							Value: "ed25519",
-							Usage: "Type of key to generate (rsa or ed25519)",
-						},
-					},
+					Name:   "new",
+					Usage:  "Generate new Tor onion.key file",
 					Action: tavernOnionNew,
 				},
 			},
@@ -108,7 +98,7 @@ func tavernInit(ctx *cli.Context) {
 	if os.IsNotExist(err) {
 		os.Mkdir("public", os.ModePerm)
 	}
-	generateOnionFile("ed25519")
+	generateOnionFile()
 	fmt.Println("Done")
 }
 
@@ -127,18 +117,16 @@ func tavernRun(ctx *cli.Context) {
 		log.Fatal(err)
 	}
 	fmt.Printf("Local server: http://%s:%d\n", c.Server.Host, c.Server.Port)
-	if a.Tor != nil {
-		fmt.Printf("Hidden service: http://%s.onion\n", a.Tor.Onion.ServiceID)
-	}
+	serviceID := a.Tor.OnionKey.ServiceID()
+	fmt.Printf("Hidden service: http://%s.onion\n", serviceID)
 	a.Run()
 }
 
 func tavernOnionNew(ctx *cli.Context) {
-	generateOnionFile(ctx.String("type"))
+	generateOnionFile()
 }
 
-func generateOnionFile(keyType string) {
-	var onion *torgo.Onion
+func generateOnionFile() {
 	_, err := os.Stat("onion.key")
 	if err == nil {
 		fmt.Printf("Overwrite existing onion.key file? (y/N): ")
@@ -146,26 +134,15 @@ func generateOnionFile(keyType string) {
 			return
 		}
 	}
-	keyType = strings.ToLower(keyType)
-	if keyType == "ed25519" {
-		onion, err = generateEd25519()
-		if err != nil {
-			log.Fatal(err)
-		}
-	} else if keyType == "rsa" {
-		onion, err = generateRSA()
-		if err != nil {
-			log.Fatal(err)
-		}
-	} else {
-		fmt.Println("Invalid key type: " + keyType)
-		os.Exit(1)
-	}
-	err = writeOnion(onion)
+	k, err := onionkey.GenerateKey()
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("Generated: %s.onion\n", onion.ServiceID)
+	err = k.WriteFile("onion.key")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Generated: %s.onion\n", k.ServiceID())
 }
 
 func getConfirm() bool {
@@ -179,41 +156,4 @@ func getConfirm() bool {
 		return true
 	}
 	return false
-}
-
-func generateEd25519() (*torgo.Onion, error) {
-	_, key, err := ed25519.GenerateKey(rand.Reader)
-	if err != nil {
-		return nil, err
-	}
-	onion, err := torgo.OnionFromEd25519(key)
-	if err != nil {
-		return nil, err
-	}
-	return onion, nil
-}
-
-func generateRSA() (*torgo.Onion, error) {
-	key, err := rsa.GenerateKey(rand.Reader, 1024)
-	if err != nil {
-		return nil, err
-	}
-	onion, err := torgo.OnionFromRSA(key)
-	if err != nil {
-		return nil, err
-	}
-	return onion, nil
-}
-
-func writeOnion(onion *torgo.Onion) error {
-	f, err := os.Create("onion.key")
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	_, err = f.WriteString(onion.PrivateKeyType + ":" + onion.PrivateKey)
-	if err != nil {
-		return err
-	}
-	return nil
 }

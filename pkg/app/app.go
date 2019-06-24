@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"net"
 	"net/http"
 
@@ -30,7 +31,7 @@ func NewApp(c *Config) (*App, error) {
 		return nil, err
 	}
 	// setup tor
-	t, err := newTor(c.Tor, c.Server)
+	t, err := newTor(c.Tor)
 	if err != nil {
 		return nil, err
 	}
@@ -46,5 +47,15 @@ func NewApp(c *Config) (*App, error) {
 
 // Run starts App server.
 func (a *App) Run() error {
+	cs := a.Config.Server
+	onion, err := a.Tor.OnionKey.Onion()
+	if err != nil {
+		return err
+	}
+	onion.Ports[80] = fmt.Sprintf("%s:%d", cs.Host, cs.Port)
+	err = a.Tor.Controller.AddOnion(onion)
+	if err != nil {
+		return err
+	}
 	return http.Serve(a.Listener, a.Router)
 }
