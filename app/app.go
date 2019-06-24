@@ -29,18 +29,17 @@ func NewApp(c *Config) (*App, error) {
 	if err != nil {
 		return nil, err
 	}
+	// setup tor
+	t, err := newTor(c.Tor, c.Server)
+	if err != nil {
+		return nil, err
+	}
 	// setup App
 	a := &App{
 		Config:   c,
 		Router:   r,
+		Tor:      t,
 		Listener: ln,
-	}
-	// setup tor
-	if c.Tor != nil {
-		a.Tor, err = newTor(c.Tor, c.Server)
-		if err != nil {
-			return nil, err
-		}
 	}
 	return a, nil
 }
