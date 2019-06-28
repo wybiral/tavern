@@ -10,7 +10,7 @@ func newListener(cfg *ServerConfig) (net.Listener, error) {
 	addr := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
 	ln, err := net.Listen("tcp", addr)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 	// set actual port on config object (in case original port was 0)
 	cfg.Port = ln.Addr().(*net.TCPAddr).Port
